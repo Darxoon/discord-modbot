@@ -1,25 +1,29 @@
-import { Client } from "discord.js";
+import { Client, Message, PartialMessage } from "discord.js";
 import { config } from "../index"
+import { CommandManager } from "./commands/commandManager";
 
-export namespace ModBot {
 
-	export namespace Bot {
+export namespace Bot {
 
-		export function start(client: Client) {
+	export function start(client: Client) {
 
-			client.on('ready', () => {
-				console.log('Logged in as'.blue, client.user.tag.yellow);
-			})
+		client.on('ready', () => {
+			console.log('\nLogged in as'.blue, client.user.tag.yellow);
+		})
 
-			client.on('message', messsage => {
-				if(messsage.author != client.user && messsage.content.startsWith(config.prefix)) {
-					const text = messsage.content.slice(config.prefix.length)
-					console.log(text);
-					messsage.reply('ne')
-				}
-			})
+		client.on('message', (message: Message) => {
+			
+			if(message.author != client.user && message.content.startsWith(config.prefix)) {
+				const text = message.content.slice(config.prefix.length)
+				const args = text.split(' ')
 
-		}
+				console.log(text);
+				
+				CommandManager.call(args, message)
+				
+			}
+		})
 
 	}
+
 }
