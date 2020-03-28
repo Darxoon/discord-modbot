@@ -9,7 +9,12 @@ export class ServiceApi {
 
 	private serviceDataLocation: string
 	private service: Service
-
+	
+	public constructor(service: Service) {
+		this.service = service
+		this.serviceDataLocation = path.join(dataFolderPath, service.id)
+	}
+	
 	// guild management
 	public async createGuildData(guild: string): Promise<void> {
 		const guildPath = path.join(this.serviceDataLocation, `guild-${guild}`)
@@ -22,23 +27,26 @@ export class ServiceApi {
 			await fs.rmdir(guildPath)
 	}
  
-	// TODO implement user management
-
 	// user management
-	public createUser(guild: string, user: string): void {}
-	public removeUser(guild: string, user: string): void {}
-  
-	public getUserData(guild: string, user: string, dataPath: string): string { return "" }
-	public setUserData(guild: string, user: string, dataPath: string, value: string): void {}
-  
-	public getUserDataJson(guild: string, user: string, dataPath: string): any {}
-	public setUserDataJson(guild: string, user: string, dataPath: string, value: any): void {}
-  
-	public removeUserData(guild: string, user: string, dataPath: string): string { return "" }
+	public async getUserData(guild: string, user: string): Promise<any> {
+		const filePath = path.join('userdata', 'user-' + user)
+		// check if file exists
+		if(!await fs.exists(filePath))
+			return {}
+		else 
+			return await this.getFileJson(guild, filePath)
+	}
+	public async setUserData(guild: string, user: string, value: any): Promise<void> {
+		const filePath = path.join('userdata', 'user-' + user)
+		await this.writeFileJson(guild, filePath, value)
+	}
+	
+	public async removeUserData(guild: string, user: string): Promise<void> {
+		const filePath = path.join('userdata', 'user-' + user)
+		await this.removeFile(guild, filePath)
+	}
   
 	// file management
-	// TODO check that path is inside guild folder
-
 	public async getFile(guild: string, dataPath: string): Promise<string> {
 		const filePath = path.join(this.serviceDataLocation, `guild-${guild}`, dataPath)
 		// check if path is inside guild folder
@@ -70,9 +78,5 @@ export class ServiceApi {
 		await fs.unlink(filePath)
 	}
 
-	public constructor(service: Service) {
-		this.service = service
-		this.serviceDataLocation = path.join(dataFolderPath, service.id)
-	}
 }
 
