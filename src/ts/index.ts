@@ -6,6 +6,7 @@ import { Command } from './core/commands/command'
 import { CommandLoader } from './core/commands/commandLoader'
 import { ServiceManager } from './core/services/serviceManager'
 import { Service } from './core/services/service'
+import { ServiceLoader } from './core/services/serviceLoader'
 
 require('colors')
 
@@ -22,19 +23,11 @@ CommandLoader.loadFromDirectory('./src/data/modules/commands/')
 
 // register services
 ServiceManager.addGuild(gname)
-ServiceManager.registerService(gname, Service('autorole', {name: 'AutoRole', description: 'Assigns a default role to every user'}, [], {
-	userJoined(event, api) {
-		console.log('autorole', event)
-	}
-}))
-ServiceManager.registerService(gname, Service('tracklist', {name: 'Tracklist', description: 'Tracks a list of every user ever on this server'}, [], {
-	userJoined(event, api) {
-		console.log('tracklist', event)
-	}
-}))
+ServiceLoader.loadFromDirectory(gname, './src/data/modules/services/')
 
 
-ServiceManager.emit(gname, 'userJoined', {user: 'Darxoon'})
+// ServiceManager.emit(gname, 'userJoined', {user: 'Darxoon'})
+
 
 // start bot
 const client: Client = new Client;
