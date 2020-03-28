@@ -2,27 +2,12 @@ import fs from 'mz/fs'
 import path from 'path'
 import { Service } from './service'
 import { ServiceManager } from './serviceManager'
+import { FsHelpers } from '../../util/fsHelpers'
 
 export namespace ServiceLoader {
 
-	// TODO offload into fsHelpers file
-	function getAllFiles(dirPath: string): string[] {
-		const files = fs.readdirSync(dirPath)
-	   
-		const arrayOfFiles: string[] = []
-	   
-		for(const file of files) {
-			if (fs.statSync(dirPath + "/" + file).isDirectory())
-				arrayOfFiles.push(...getAllFiles(dirPath + "/" + file))
-			else
-				arrayOfFiles.push(path.join(path.resolve(dirPath), file))
-		}
-	   
-		return arrayOfFiles
-	}
-
 	export function loadFromDirectory(guild: string, dir: string) {
-		const filePaths = getAllFiles(dir)
+		const filePaths = FsHelpers.getAllFiles(dir)
 		console.log(filePaths);
 		const services: Map<string, Service> = new Map
 
@@ -37,7 +22,7 @@ export namespace ServiceLoader {
 			const module: Service = require(modulePath)
 			console.log(module)
 
-			// TODO verify that it's a valid command
+			// TODO verify that it's a valid service
 
 			services.set(module.id, require(modulePath))
 		})

@@ -1,30 +1,14 @@
-import fs from 'mz/fs'
-import path from 'path'
 import { Command } from './command'
 import colors from 'colors'
 import { CommandManager } from './commandManager'
+import { FsHelpers } from '../../util/fsHelpers'
 
 require('colors')
 
 export namespace CommandLoader {
 
-	function getAllFiles(dirPath: string): string[] {
-		const files = fs.readdirSync(dirPath)
-	   
-		const arrayOfFiles: string[] = []
-	   
-		for(const file of files) {
-			if (fs.statSync(dirPath + "/" + file).isDirectory())
-				arrayOfFiles.push(...getAllFiles(dirPath + "/" + file))
-			else
-				arrayOfFiles.push(path.join(path.resolve(dirPath), file))
-		}
-	   
-		return arrayOfFiles
-	}
-
 	export function loadFromDirectory(dir: string) {
-		const filePaths = getAllFiles(dir)
+		const filePaths = FsHelpers.getAllFiles(dir)
 		console.log(filePaths);
 		const commands: Map<string, Command> = new Map
 
