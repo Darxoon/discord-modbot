@@ -1,6 +1,7 @@
 import { Service } from "./service"
 import fs from "mz/fs"
 import path from 'path'
+import { isInside } from 'is-inside'
 
 const dataFolderPath = './src/data/serviceData'
 
@@ -9,20 +10,20 @@ export class ServiceApi {
 	private serviceDataLocation: string
 	private service: Service
 
-	// TODO make async
-
 	// guild management
-	public createGuildData(guild: string): void {
+	public async createGuildData(guild: string): Promise<void> {
 		const guildPath = path.join(this.serviceDataLocation, `guild-${guild}`)
-		if(!fs.existsSync(guildPath))
-			fs.mkdirSync(guildPath)
+		if(!await fs.exists(guildPath))
+			await fs.mkdir(guildPath)
 	}
-	public removeGuildData(guild: string): void {
+	public async removeGuildData(guild: string): Promise<void> {
 		const guildPath = path.join(this.serviceDataLocation, `guild-${guild}`)
-		if(fs.existsSync(guildPath))
-			fs.rmdirSync(guildPath)
+		if(await fs.exists(guildPath))
+			await fs.rmdir(guildPath)
 	}
  
+	// TODO implement user management
+
 	// user management
 	public createUser(guild: string, user: string): void {}
 	public removeUser(guild: string, user: string): void {}
@@ -37,28 +38,36 @@ export class ServiceApi {
   
 	// file management
 	// TODO check that path is inside guild folder
-	// TODO error checking
-	public getFile(guild: string, dataPath: string): string {
+
+	public async getFile(guild: string, dataPath: string): Promise<string> {
 		const filePath = path.join(this.serviceDataLocation, `guild-${guild}`, dataPath)
-		const data = fs.readFileSync(filePath, 'utf8')
+		// check if path is inside guild folder
+		if(!isInside(filePath, path.join(this.serviceDataLocation, `guild-${guild}`)))
+			throw new Error(`Service '${this.service.name}' tried to read file '${filePath}' outside of guild folder. Access denied.`)
+		// return data
+		const data = await fs.readFile(filePath, 'utf8')
 		return data
 	}
-	public writeFile(guild: string, dataPath: string, value: string): void {
+	public async writeFile(guild: string, dataPath: string, value: string): Promise<void> {
 		const filePath = path.join(this.serviceDataLocation, `guild-${guild}`, dataPath)
-		fs.truncateSync(filePath)
-		fs.writeFileSync(filePath, value, 'utf8')
+		// check if path is inside guild folder
+		if(!isInside(filePath, path.join(this.serviceDataLocation, `guild-${guild}`)))
+			throw new Error(`Service '${this.service.name}' tried to write to file '${filePath}' outside of guild folder. Access denied.`)
+		// write data
+		await fs.truncate(filePath)
+		await fs.writeFile(filePath, value, 'utf8')
 	}
   
-	public getFileJson(guild: string, dataPath: string): any {
-		return JSON.parse(this.getFile(guild, dataPath))
+	public async getFileJson(guild: string, dataPath: string): Promise<any> {
+		return JSON.parse(await this.getFile(guild, dataPath))
 	}
-	public writeFileJson(guild: string, dataPath: string, value: any): void {
-		this.writeFile(guild, dataPath, JSON.stringify(value))
+	public async writeFileJson(guild: string, dataPath: string, value: any): Promise<void> {
+		await this.writeFile(guild, dataPath, JSON.stringify(value))
 	}
   
-	public removeFile(guild: string, dataPath: string): void {
+	public async removeFile(guild: string, dataPath: string): Promise<void> {
 		const filePath = path.join(this.serviceDataLocation, `guild-${guild}`, dataPath)
-		fs.unlinkSync(filePath)
+		await fs.unlink(filePath)
 	}
 
 	public constructor(service: Service) {
