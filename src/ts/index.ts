@@ -1,11 +1,7 @@
-import discordjs, { Client, User } from 'discord.js'
-import colors from 'colors'
+import { Client } from 'discord.js'
 import { Bot } from './core/bot'
-import { CommandManager } from './core/commands/commandManager'
-import { Command } from './core/commands/command'
 import { CommandLoader } from './core/commands/commandLoader'
 import { ServiceManager } from './core/services/serviceManager'
-import { Service } from './core/services/service'
 import { ServiceLoader } from './core/services/serviceLoader'
 
 require('colors')

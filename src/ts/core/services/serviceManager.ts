@@ -33,8 +33,14 @@ export namespace ServiceManager {
 	// TODO replace any with event type
 	export function emit(guild: string, eventName: string, event: any) {
 		services.get(guild).forEach(service => {
-			if(service.events[eventName])
-				service.events[eventName](event, new ServiceApi(service))
+			if(service.events[eventName]) {
+				try {
+					service.events[eventName](event, new ServiceApi(service))
+				} catch (e) {
+					console.error(`Error while executing event '${eventName}' on service '${service.name}':`.red)
+					console.error(e)
+				}
+			}
 		})
 	}
 

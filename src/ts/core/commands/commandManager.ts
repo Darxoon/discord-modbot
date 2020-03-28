@@ -1,5 +1,7 @@
 import { Command } from './command'
 import { Message } from 'discord.js'
+import { ServiceManager } from '../services/serviceManager'
+import { gname } from '../..'
 
 export namespace CommandManager {
 
@@ -29,8 +31,13 @@ export namespace CommandManager {
 			console.log(`Command '${args[0]}' doesn't exist (in Message '${message.content}')`.red)
 			return
 		} else {
-			console.log(`Command '${args[0]}' called (in Message '${message.content}')`.blue)
-			command.call(args, message)
+			try {
+				command.call(args, message)
+				console.log(`Command '${args[0]}' called (in Message '${message.content}')`.blue)
+			} catch (e) {
+				console.error(`Error while trying to call command '${args[0]}':`.red)
+				console.error(e)
+			}
 		}
 	}
 
