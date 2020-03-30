@@ -1,5 +1,5 @@
 import { Command } from './command'
-import { Message } from 'discord.js'
+import discord, { Message, MessageEmbed } from 'discord.js'
 import { ServiceManager } from '../services/serviceManager'
 import { gname } from '../..'
 
@@ -9,7 +9,7 @@ export namespace CommandManager {
 
 	export function registerCommand(command: Command) {
 		commands.push(command)
-		console.log(`Registered command`.green, command.name.yellow)
+		console.log(`Registered command`.blue, command.name.yellow)
 	}
 	export function registerCommands(...commandsToPush: Command[]) {
 		commandsToPush.forEach(command => {
@@ -26,6 +26,11 @@ export namespace CommandManager {
 	}
 
 	export function call(args: string[], message: Message) {
+		if(args[0] === 'help') {
+			helpMenu(args, message)
+			return
+		}
+
 		const command = getCommand(args[0])
 		if(!command) {
 			console.log(`Command '${args[0]}' doesn't exist (in Message '${message.content}')`.red)
@@ -39,6 +44,17 @@ export namespace CommandManager {
 				console.error(e)
 			}
 		}
+	}
+
+	export function helpMenu(args: string[], message: Message) {
+		const embed = new MessageEmbed()
+			.setTitle('Help Menu')
+			.setDescription('Here are the available commands:')
+			.setColor('#3498db')
+		commands.forEach(command => {
+			embed.addField(command.name, `${command.description}\nSyntax: \`${command.syntax}\``, true)
+		})
+		message.channel.send('This is a basic help menu.', embed)
 	}
 
 }
