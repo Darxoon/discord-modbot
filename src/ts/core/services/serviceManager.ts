@@ -12,9 +12,8 @@ export namespace ServiceManager {
 
 
 	export function registerService(guild: string, service: Service) {
-		console.log('aaaaa'.red, [...services]);
 		services.get(guild).push(service)
-		console.log(`Registered service`.green, service.name.yellow)
+		console.log(`Registered service`.blue, service.name.yellow)
 	}
 
 	export function registerServices(guild: string, ...servicesToPush: Service[]) {

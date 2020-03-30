@@ -8,7 +8,7 @@ export namespace Bot {
 	export function start(client: Client) {
 
 		client.on('ready', () => {
-			console.log('\nLogged in as'.blue, client.user.tag.yellow);
+			console.log('\nLogged in as'.green, client.user.tag.yellow);
 		})
 
 		client.on('message', (message: Message) => {
